@@ -2,42 +2,115 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>ระบบการจองคิว</title>
-    <script>
-        async function addBooking() {
-            const name = document.getElementById('name').value;
-            const time = document.getElementById('time').value;
-            const response = await fetch('https://yourapiurl.com/api/queue', { // เปลี่ยน URL นี้ให้เป็น API ของคุณ
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name, time }),
-            });
-            if (response.ok) {
-                alert('การจองถูกเพิ่มแล้ว');
-            }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จองโต๊ะ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
         }
-
-        async function fetchBookings() {
-            const response = await fetch('https://yourapiurl.com/api/queue'); // เปลี่ยน URL นี้ให้เป็น API ของคุณ
-            const bookings = await response.json();
-            const list = document.getElementById('booking-list');
-            list.innerHTML = '';
-            bookings.forEach(booking => {
-                const item = document.createElement('li');
-                item.textContent = `${booking.name} - ${booking.time} (${booking.status})`;
-                list.appendChild(item);
-            });
+        label {
+            display: block;
+            margin-bottom: 8px;
         }
-    </script>
+        input, select {
+            padding: 8px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #booking-list {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>ระบบการจองคิว</h1>
-    <input type="text" id="name" placeholder="ชื่อผู้จอง">
-    <input type="time" id="time">
-    <button onclick="addBooking()">เพิ่มการจอง</button>
-    <button onclick="fetchBookings()">ดูการจองทั้งหมด</button>
-    <ul id="booking-list"></ul>
+
+    <h1>ระบบจองโต๊ะ</h1>
+
+    <form id="bookingForm">
+        <label for="name">ชื่อผู้จอง</label>
+        <input type="text" id="name" required>
+
+        <label for="time">เวลา</label>
+        <input type="datetime-local" id="time" required>
+
+        <label for="people">จำนวนคน</label>
+        <input type="number" id="people" min="1" required>
+
+        <label for="seats">จำนวนที่นั่งที่ต้องการจอง</label>
+        <input type="number" id="seats" min="1" required>
+
+        <button type="submit">จองโต๊ะ</button>
+    </form>
+
+    <div id="booking-list">
+        <h2>รายการการจอง</h2>
+        <ul id="bookings"></ul>
+    </div>
+
+    <script>
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // ดึงค่าจากฟอร์ม
+            const name = document.getElementById('name').value;
+            const time = document.getElementById('time').value;
+            const people = document.getElementById('people').value;
+            const seats = document.getElementById('seats').value;
+
+            // สร้างวัตถุการจอง
+            const booking = {
+                name: name,
+                time: time,
+                people: people,
+                seats: seats
+            };
+
+            // ดึงข้อมูลจาก localStorage
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+
+            // เพิ่มการจองใหม่ลงในรายการ
+            bookings.push(booking);
+
+            // เก็บข้อมูลกลับไปใน localStorage
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+
+            // เคลียร์ฟอร์ม
+            document.getElementById('bookingForm').reset();
+
+            // อัพเดตรายการการจอง
+            displayBookings();
+        });
+
+        // ฟังก์ชันเพื่อแสดงรายการการจอง
+        function displayBookings() {
+            const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            const bookingsList = document.getElementById('bookings');
+
+            // เคลียร์รายการเก่า
+            bookingsList.innerHTML = '';
+
+            // เพิ่มรายการใหม่
+            bookings.forEach((booking, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${booking.name} - ${booking.time} - จำนวนคน: ${booking.people} - จำนวนที่นั่งที่จอง: ${booking.seats}`;
+                bookingsList.appendChild(li);
+            });
+        }
+
+        // เรียกฟังก์ชันแสดงรายการเมื่อโหลดหน้าเว็บ
+        displayBookings();
+    </script>
+
 </body>
 </html>
