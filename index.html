@@ -44,9 +44,6 @@
         <label for="time">เวลา</label>
         <input type="datetime-local" id="time" required>
 
-        <label for="people">จำนวนคน</label>
-        <input type="number" id="people" min="1" required>
-
         <label for="seats">จำนวนที่นั่งที่ต้องการจอง</label>
         <input type="number" id="seats" min="1" required>
 
@@ -65,14 +62,12 @@
             // ดึงค่าจากฟอร์ม
             const name = document.getElementById('name').value;
             const time = document.getElementById('time').value;
-            const people = document.getElementById('people').value;
             const seats = document.getElementById('seats').value;
 
             // สร้างวัตถุการจอง
             const booking = {
                 name: name,
                 time: time,
-                people: people,
                 seats: seats
             };
 
@@ -103,7 +98,7 @@
             // เพิ่มรายการใหม่
             bookings.forEach((booking, index) => {
                 const li = document.createElement('li');
-                li.textContent = `${booking.name} - ${booking.time} - จำนวนคน: ${booking.people} - จำนวนที่นั่งที่จอง: ${booking.seats}`;
+                li.textContent = `${booking.name} - ${booking.time} - จำนวนที่นั่งที่จอง: ${booking.seats}`;
                 bookingsList.appendChild(li);
             });
         }
